@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Blog Reactions Dashboard&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body { font-family: sans-serif; padding: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>table { width: 100%; border-collapse: collapse; margin-top: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>th { cursor: pointer; background-color: #f5f5f5; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>tr:nth-child(even) { background-color: #fafafa; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.filter-section { margin-bottom: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.filter-section label, .filter-section input {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-right: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;h1&gt;Blog Reaction Dashboard&lt;/h1&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="filter-section"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;label for="startDate"&gt;Start Date:&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="date" id="startDate"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;label for="endDate"&gt;End Date:&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="date" id="endDate"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="loadReactions()"&gt;Filter&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;table id="reactionTable"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;th onclick="sortTable(0)"&gt;Blog Title&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;th onclick="sortTable(1)"&gt;Total Votes&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;th onclick="sortTable(2)"&gt;👍 Up Votes&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;th onclick="sortTable(3)"&gt;👎 Down Votes&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;th onclick="sortTable(4)"&gt;⭐ Overall Rating&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;tbody&gt;&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/table&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const firebaseConfig = {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>apiKey: "AIzaSyAH3dii31iHaddF84QU4WcpJi5Q19x3Z1w",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>authDomain: "dograh-ghost-blog-reactions.firebaseapp.com",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>projectId: "dograh-ghost-blog-reactions",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>storageBucket: "dograh-ghost-blog-reactions.firebasestorage.app",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>messagingSenderId: "736797014557",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>appId: "1:736797014557:web:8a57061b95900bfba064f4",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>measurementId: "G-0J0NXYH7JS"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>firebase.initializeApp(firebaseConfig);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const db = firebase.firestore();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const tableBody = document.querySelector('#reactionTable tbody');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function getDateInput(id) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const value = document.getElementById(id).value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return value ? new Date(value) : null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function loadReactions() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>tableBody.innerHTML = "Loading...";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const startDate = getDateInput("startDate");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const endDate = getDateInput("endDate");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const dataMap = {};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const snapshot = await db.collection("reactions").get();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>snapshot.forEach(doc =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const data = doc.data();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const { postId, reactionType, timestamp } = data;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!postId || !reactionType) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const reactionTime = timestamp?.toDate?.() || new Date();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>(startDate &amp;&amp; reactionTime &lt; startDate) ||</p>
+<p class="p1"><span class="Apple-converted-space">          </span>(endDate &amp;&amp; reactionTime &gt; endDate)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!dataMap[postId]) dataMap[postId] = { up: 0, down: 0 };</p>
+<p class="p1"><span class="Apple-converted-space">        </span>dataMap[postId][reactionType]++;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>populateTable(dataMap);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function populateTable(dataMap) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>tableBody.innerHTML = "";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Object.entries(dataMap).forEach(([postId, { up, down }]) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const total = up + down;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const rating = total &gt; 0 ? (up / total).toFixed(2) : "0.00";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const row = document.createElement('tr');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>row.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td&gt;${postId}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td&gt;${total}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td&gt;${up}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td&gt;${down}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td&gt;${rating}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tableBody.appendChild(row);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function sortTable(n) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const table = document.getElementById("reactionTable");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let switching = true;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let dir = "desc";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>while (switching) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>switching = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let rows = table.rows;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for (let i = 1; i &lt; rows.length - 1; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let shouldSwitch = false;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let x = rows[i].getElementsByTagName("TD")[n];</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let y = rows[i + 1].getElementsByTagName("TD")[n];</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const xVal = isNaN(x.innerHTML) ? x.innerHTML.toLowerCase() : parseFloat(x.innerHTML);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const yVal = isNaN(y.innerHTML) ? y.innerHTML.toLowerCase() : parseFloat(y.innerHTML);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if ((dir === "asc" &amp;&amp; xVal &gt; yVal) || (dir === "desc" &amp;&amp; xVal &lt; yVal)) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>shouldSwitch = true;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>break;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (shouldSwitch) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>switching = true;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else if (!switching &amp;&amp; dir === "desc") {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>dir = "asc";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>switching = true;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>loadReactions();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
